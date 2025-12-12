@@ -1,0 +1,379 @@
+import Usuario from '../models/usuario.js'
+import Sesion from '../models/sesione.js'
+import Institucion from '../models/institucione.js'
+
+export type Area = 'Matematicas' | 'Lenguaje' | 'Ciencias' | 'Sociales' | 'Ingles'
+const AREAS: Area[] = ['Matematicas', 'Lenguaje', 'Ciencias', 'Sociales', 'Ingles']
+
+function rangoMes(fecha: Date) {
+  const inicio = new Date(fecha.getFullYear(), fecha.getMonth(), 1)
+  const fin = new Date(fecha.getFullYear(), fecha.getMonth() + 1, 1)
+  return { inicio, fin }
+}
+
+// Normalización de nombres de área a las 5 canónicas
+function norm(s: string) {
+  return String(s || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+function mapArea(raw: string): Area | null {
+  const n = norm(raw)
+  if (!n) return null
+  if (n.startsWith('matematic')) return 'Matematicas'
+  if (n.startsWith('ingl')) return 'Ingles'
+  if (n.startsWith('cien')) return 'Ciencias'
+  if (n.startsWith('soci') || n.includes('socilae')) return 'Sociales'
+  if (n.includes('lect') || n.startsWith('lengua')) return 'Lenguaje'
+  return null
+}
+
+function cursoLabel(u: any) {
+  const grado = (u?.grado ?? u?.grado_nombre ?? '').toString().trim()
+  const grupo = (u?.grupo ?? u?.seccion ?? '').toString().trim()
+  const curso = (u?.curso ?? '').toString().trim()
+  if (grado && grupo) return `${grado}°${grupo}`
+  if (curso) return curso
+  return grado || 'Sin curso'
+}
+
+export default class DashboardAdminService {
+  /** Obtener los IDs de los estudiantes de la institución */
+  private async idsEstudiantes(id_institucion: number): Promise<number[]> {
+    const estudiantes = await Usuario
+      .query()
+      .where('rol', 'estudiante')
+      .where('id_institucion', id_institucion)
+      .select(['id_usuario'])
+    return estudiantes.map((e) => e.id_usuario)
+  }
+
+  /** Query base para sesiones del periodo (terminadas en el rango o abiertas iniciadas en el rango) */
+  private baseSesionesPeriodo(ids: number[], inicio: Date, fin: Date) {
+    return Sesion.query()
+      .whereIn('id_usuario', ids)
+      .whereIn('tipo', ['practica', 'simulacro'] as any)
+      .where((qb) => {
+        qb
+          .where((q) => q.where('fin_at', '>=', inicio as any).andWhere('fin_at', '<', fin as any))
+          .orWhere((q) =>
+            q.whereNull('fin_at')
+              .andWhere('inicio_at', '>=', inicio as any)
+              .andWhere('inicio_at', '<', fin as any)
+          )
+      })
+      .select(['id_usuario', 'area', 'subtema', 'puntaje_porcentaje', 'inicio_at', 'fin_at'])
+  }
+
+  /** Bienvenida institucional */
+  async obtenerInstitucion(id_institucion: number) {
+    const institucion = await Institucion.query().where('id_institucion', id_institucion).first()
+    if (!institucion) throw new Error('Institución no encontrada')
+    return institucion.nombre_institucion
+  }
+
+  /** Tarjetas por área (EN VIVO: sesiones abiertas) */
+  // services/dashboard_admin_service.ts
+async tarjetasPorArea(id_institucion: number) {
+  const ids = await this.idsEstudiantes(id_institucion)
+
+  const res: Record<Area, number> = {
+    Matematicas: 0, Lenguaje: 0, Ciencias: 0, Sociales: 0, Ingles: 0,
+  }
+  if (!ids.length) return res
+
+  //  Solo sesiones ABIERTAS del estudiante (estado “está practicando ahora”)
+  const abiertas = await Sesion.query()
+    .whereIn('id_usuario', ids)
+    .whereNull('fin_at') // ← clave para que baje de un área y suba en la otra
+    .select(['id_usuario', 'area', 'inicio_at'])
+
+  // contar TODAS las sesiones abiertas por área (permite múltiples áreas simultáneas)
+  for (const s of abiertas as any[]) {
+    const a = String((s as any).area || '').trim()
+    if (a === 'Matematicas') res.Matematicas++
+    else if (a === 'Lenguaje') res.Lenguaje++
+    else if (a === 'Ciencias') res.Ciencias++
+    else if (a === 'Sociales') res.Sociales++
+    else if (a === 'Ingles') res.Ingles++
+  }
+
+  return res
+}
+
+
+  /** Progreso mensual por área (últimos N meses) */
+  async progresoMensualPorArea(id_institucion: number, meses = 6) {
+    const ids = await this.idsEstudiantes(id_institucion)
+    const hoy = new Date()
+    const series: Record<Area, Array<{ mes: string; promedio: number }>> = {
+      Matematicas: [], Lenguaje: [], Ciencias: [], Sociales: [], Ingles: [],
+    }
+    if (ids.length === 0) return series
+
+    for (let i = meses - 1; i >= 0; i--) {
+      const ref = new Date(hoy.getFullYear(), hoy.getMonth() - i, 1)
+      const { inicio, fin } = rangoMes(ref)
+      const etiquetaMes = `${ref.getFullYear()}-${String(ref.getMonth() + 1).padStart(2, '0')}`
+
+      const ses = await this.baseSesionesPeriodo(ids, inicio, fin)
+
+      for (const area of AREAS) {
+        const filtro = ses.filter((x: any) => x.area === area && x.puntaje_porcentaje != null)
+        const avg = filtro.length
+          ? Math.round(filtro.reduce((a: any, b: any) => a + Number(b.puntaje_porcentaje || 0), 0) / filtro.length)
+          : 0
+        series[area].push({ mes: etiquetaMes, promedio: avg })
+      }
+    }
+    return series
+  }
+
+  /** Rendimiento del mes por área */
+  async rendimientoDelMes(id_institucion: number, year: number, month1_12: number) {
+    const ids = await this.idsEstudiantes(id_institucion)
+    const { inicio, fin } = rangoMes(new Date(year, month1_12 - 1, 1))
+    const res: Record<Area, number> = {
+      Matematicas: 0, Lenguaje: 0, Ciencias: 0, Sociales: 0, Ingles: 0,
+    }
+    if (ids.length === 0) return res
+
+    const ses = await this.baseSesionesPeriodo(ids, inicio, fin)
+
+    for (const area of AREAS) {
+      const filtro = ses.filter((x: any) => x.area === area && x.puntaje_porcentaje != null)
+      res[area] = filtro.length
+        ? Math.round(filtro.reduce((a: any, b: any) => a + Number(b.puntaje_porcentaje || 0), 0) / filtro.length)
+        : 0
+    }
+    return res
+  }
+
+  /** KPIs resumen */
+  async kpisResumen(id_institucion: number, fechaRef = new Date()) {
+    const ids = await this.idsEstudiantes(id_institucion)
+    if (!ids.length) return { promedioActual: 0, mejoraEsteMes: 0, estudiantesParticipando: 0 }
+
+    const { inicio: iniAct, fin: finAct } = rangoMes(fechaRef)
+    const { inicio: iniAnt, fin: finAnt } = rangoMes(new Date(fechaRef.getFullYear(), fechaRef.getMonth() - 1, 1))
+
+    const sesAct = await this.baseSesionesPeriodo(ids, iniAct, finAct)
+    const sesAnt = await this.baseSesionesPeriodo(ids, iniAnt, finAnt)
+
+    const prom = (lista: any[]) => {
+      const v = lista.filter(x => (x as any).puntaje_porcentaje != null).map(x => Number((x as any).puntaje_porcentaje))
+      return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0
+    }
+
+    const promedioActual = prom(sesAct as any)
+    const promedioAnterior = prom(sesAnt as any)
+
+    const estudiantesParticipando = new Set((sesAct as any[]).map(s => (s as any).id_usuario)).size
+    const mejoraEsteMes = promedioActual - promedioAnterior
+
+    return { promedioActual, mejoraEsteMes, estudiantesParticipando }
+  }
+
+  /** Comparativa por cursos */
+  async comparativoPorCursos(id_institucion: number, fechaRef = new Date()) {
+    const ids = await this.idsEstudiantes(id_institucion)
+    if (!ids.length) return { items: [] as any[] }
+
+    const { inicio: iniAct, fin: finAct } = rangoMes(fechaRef)
+    const { inicio: iniAnt, fin: finAnt } = rangoMes(new Date(fechaRef.getFullYear(), fechaRef.getMonth() - 1, 1))
+
+    const estudiantes = await Usuario
+      .query()
+      .whereIn('id_usuario', ids)
+      .select(['id_usuario', 'grado', 'grupo', 'curso'])
+
+    const sesAct = await this.baseSesionesPeriodo(ids, iniAct, finAct)
+    const sesAnt = await this.baseSesionesPeriodo(ids, iniAnt, finAnt)
+
+    const byCurso = (ses: any[]) => {
+      const map = new Map<string, any[]>()
+      for (const s of ses) {
+        const u = estudiantes.find(e => (e as any).id_usuario === (s as any).id_usuario)
+        const key = cursoLabel(u)
+        if (!map.has(key)) map.set(key, [])
+        map.get(key)!.push(s)
+      }
+      return map
+    }
+
+    const act = byCurso(sesAct as any)
+    const ant = byCurso(sesAnt as any)
+
+    const items: Array<{ curso: string; estudiantes: number; promedio: number; progreso: number }> = []
+
+    const cursos = new Set<string>([...act.keys(), ...ant.keys(), ...estudiantes.map(u => cursoLabel(u))])
+
+    for (const c of cursos) {
+      const sesA = act.get(c) ?? []
+      const sesB = ant.get(c) ?? []
+
+      const estudiantesCurso = new Set(
+        (estudiantes as any[]).filter(u => cursoLabel(u) === c).map(u => (u as any).id_usuario)
+      ).size
+
+      const prom = (lista: any[]) => {
+        const v = lista.filter(x => (x as any).puntaje_porcentaje != null).map(x => Number((x as any).puntaje_porcentaje))
+        return v.length ? Math.round(v.reduce((a, b) => a + b, 0) / v.length) : 0
+      }
+
+      const promedio = prom(sesA)
+      const promedioAnt = prom(sesB)
+      const progreso = promedio - promedioAnt
+
+      items.push({ curso: c, estudiantes: estudiantesCurso, promedio, progreso })
+    }
+
+    items.sort((a, b) => a.curso.localeCompare(b.curso, 'es'))
+
+    return { items }
+  }
+
+  /** Áreas a reforzar (mes actual) */
+  async areasRefuerzo(id_institucion: number, umbral = 60, fechaRef = new Date()) {
+    const ids = await this.idsEstudiantes(id_institucion)
+    if (!ids.length) return { areas: [] as Array<{ area: Area; promedio: number }> }
+
+    const { inicio, fin } = rangoMes(fechaRef)
+    const ses = await this.baseSesionesPeriodo(ids, inicio, fin)
+
+    const res: Array<{ area: Area; promedio: number }> = []
+    for (const area of AREAS) {
+      const filtro = ses.filter(x => (x as any).area === area && (x as any).puntaje_porcentaje != null)
+      const prom = filtro.length
+        ? Math.round(filtro.reduce((a, b) => a + Number(b.puntaje_porcentaje || 0), 0) / filtro.length)
+        : 0
+      if (prom < umbral) res.push({ area, promedio: prom })
+    }
+    res.sort((a, b) => a.promedio - b.promedio)
+    return { areas: res }
+  }
+
+  /** Estudiantes en alerta (mes actual) */
+  async estudiantesAlerta(
+    id_institucion: number,
+    { umbral = 50, min_intentos = 2 } = {},
+    fechaRef = new Date()
+  ) {
+    const ids = await this.idsEstudiantes(id_institucion)
+    if (!ids.length) return { items: [] as Array<{ id_usuario: number; nombre: string; curso: string; grado_curso?: string; telefono?: string|null; correo?: string|null; documento?: string; promedio: number; ultima_actividad: any; materia_critica?: { area: Area; subtema: string | null; porcentaje: number } }> }
+
+    const { inicio, fin } = rangoMes(fechaRef)
+    const ses = await this.baseSesionesPeriodo(ids, inicio, fin)
+
+    const porUsuario = new Map<number, any[]>()
+    for (const s of ses) {
+      const uid = Number((s as any).id_usuario)
+      if (!porUsuario.has(uid)) porUsuario.set(uid, [])
+      porUsuario.get(uid)!.push(s)
+    }
+
+    const usuarios = await Usuario
+      .query()
+      .whereIn('id_usuario', Array.from(porUsuario.keys()))
+      .select([
+        'id_usuario',
+        'nombre',
+        'apellido',
+        'grado',
+        'curso',
+        'tipo_documento',
+        'numero_documento',
+        'correo',
+        'telefono',
+        'direccion',
+        'jornada'
+      ])
+    const userById = new Map<number, any>(usuarios.map(u => [Number((u as any).id_usuario), u]))
+
+    const items: Array<{ id_usuario: number; nombre: string; curso: string; grado_curso?: string; telefono?: string|null; correo?: string|null; documento?: string; promedio: number; ultima_actividad: any; materia_critica?: { area: Area; subtema: string | null; porcentaje: number } }> = []
+
+    for (const [uid, lista] of porUsuario.entries()) {
+      const v = lista.filter(x => x.puntaje_porcentaje != null)
+      const intentos = v.length
+      const promedio = intentos
+        ? Math.round(v.reduce((a, b) => a + Number(b.puntaje_porcentaje || 0), 0) / intentos)
+        : 0
+
+      if (intentos >= min_intentos && promedio < umbral) {
+        let u = userById.get(uid)
+        if (!u) {
+          // Fallback puntual por si no vino en el batch (consistencia)
+          u = await Usuario.find(uid)
+        }
+        const nombre = u ? ((`${(u as any).nombre ?? ''} ${(u as any).apellido ?? ''}`.trim()) || String((u as any).numero_documento || `ID ${uid}`)) : `ID ${uid}`
+        const curso = u ? cursoLabel(u) : 'Sin curso'
+        const gradoStr = String((u as any).grado ?? '').trim()
+        const cursoStr = String((u as any).curso ?? '').trim()
+        const grado_curso = gradoStr ? `${gradoStr}°${cursoStr}` : (cursoStr || 'Sin curso')
+        const telefono: string | null = (u as any).telefono ?? null
+        const correo: string | null = (u as any).correo ?? null
+        const tdoc = String((u as any).tipo_documento ?? '').trim()
+        const ndoc = String((u as any).numero_documento ?? '').trim()
+        const documento = [tdoc, ndoc].filter(Boolean).join(' ')
+        // Obtener la última actividad (ordenando por fin_at/inicio_at DESC de forma robusta)
+        const ultimaSesion = lista
+          .filter((x: any) => (x as any).fin_at || (x as any).inicio_at)
+          .sort((a: any, b: any) => {
+            const da = new Date((a as any).fin_at || (a as any).inicio_at || 0).getTime()
+            const db = new Date((b as any).fin_at || (b as any).inicio_at || 0).getTime()
+            return db - da
+          })[0]
+        const ultima_actividad = (ultimaSesion as any)?.fin_at || (ultimaSesion as any)?.inicio_at || null
+        // Materia crítica: área con menor promedio y subtema más frecuente en intentos por debajo del umbral
+        let peorArea: Area | null = null
+        let peorProm = Number.POSITIVE_INFINITY
+        for (const area of AREAS) {
+          const porArea = v.filter(x => mapArea((x as any).area) === area)
+          if (!porArea.length) continue
+          const avg = Math.round(porArea.reduce((a, b) => a + Number((b as any).puntaje_porcentaje || 0), 0) / porArea.length)
+          if (avg < peorProm) { peorProm = avg; peorArea = area }
+        }
+        let subtemaTop: string | null = null
+        let porcentajeDificultad = 0
+        if (peorArea) {
+          const sesionesArea = v.filter(x => mapArea((x as any).area) === peorArea)
+          const bajos = sesionesArea.filter(x => Number((x as any).puntaje_porcentaje || 0) < umbral)
+          const totalArea = sesionesArea.length
+          porcentajeDificultad = totalArea > 0 ? Math.round((bajos.length * 100) / totalArea) : 0
+          const cnt = new Map<string, number>()
+          for (const s of bajos as any[]) {
+            const st = String((s as any).subtema ?? '').trim()
+            if (!st) continue
+            cnt.set(st, (cnt.get(st) || 0) + 1)
+          }
+          subtemaTop = Array.from(cnt.entries()).sort((a,b) => b[1]-a[1])[0]?.[0] ?? null
+        }
+        const materia_critica = peorArea ? { area: peorArea, subtema: subtemaTop, porcentaje: porcentajeDificultad } : undefined
+        items.push({ id_usuario: uid, nombre, curso, grado_curso, telefono, correo, documento, promedio, ultima_actividad, materia_critica })
+      }
+    }
+
+    items.sort((a, b) => a.promedio - b.promedio)
+    return { items }
+  }
+
+  /** Resumen usado por controlador web */
+  async resumen(id_institucion: number) {
+    const ahora = new Date()
+    const tarjetas = await this.tarjetasPorArea(id_institucion)
+    const series = await this.progresoMensualPorArea(id_institucion, 6)
+    const rendMes = await this.rendimientoDelMes(id_institucion, ahora.getFullYear(), ahora.getMonth() + 1)
+    const kpis = await this.kpisResumen(id_institucion, ahora)
+
+    const islas = AREAS.map((area) => ({ area, activos: tarjetas[area] || 0 }))
+    const serie = AREAS.flatMap((area) =>
+      (series[area] || []).map((p) => ({ mes: p.mes, area, valor: p.promedio }))
+    )
+    const rend = AREAS.map((area) => ({ area, promedio: rendMes[area] || 0 }))
+
+    return { kpis, islas, serie, rend }
+  }
+}
