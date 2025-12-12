@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- fondo degradado tuyo -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bg_orange_pink" />
+
+    <!-- Scroll para adaptar a cualquier pantalla -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        android:overScrollMode="never">
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center_horizontal"
+            android:padding="24dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- círculo superior con ícono -->
+            <FrameLayout
+                android:layout_width="88dp"
+                android:layout_height="88dp"
+                android:layout_marginTop="75dp"
+                android:background="@drawable/circle_soft_orange">
+
+                <TextView
+                    android:text="⚔️"
+                    android:textSize="32sp"
+                    android:textColor="@android:color/white"
+                    android:layout_gravity="center"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"/>
+            </FrameLayout>
+
+            <!-- título -->
+            <TextView
+                android:text="Sala de Reto"
+                android:textStyle="bold"
+                android:textSize="24sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="12dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/tvArea"
+                android:text="Matemáticas"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="6dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- tarjeta translúcida Tú vs Oponente -->
+            <LinearLayout
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:padding="18dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="30dp"
+                android:background="#26FFFFFF">
+
+                <!-- Tú -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:gravity="center"
+                        android:text="👤"
+                        android:textSize="22sp"
+                        android:background="@drawable/circle_soft_white"
+                        android:padding="6dp"/>
+
+                    <TextView
+                        android:text="Tú"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+
+                <!-- espadas -->
+                <TextView
+                    android:text="⚔️"
+                    android:textSize="18sp"
+                    android:textColor="@android:color/white"
+                    android:layout_marginHorizontal="16dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <!-- Oponente -->
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="44dp"
+                        android:layout_height="44dp"
+                        android:gravity="center"
+                        android:text="🎓"
+                        android:textSize="22sp"
+                        android:background="@drawable/circle_soft_white"
+                        android:padding="6dp"/>
+
+                    <TextView
+                        android:id="@+id/tvOponente"
+                        android:text="Ana García"
+                        android:textStyle="bold"
+                        android:textSize="14sp"
+                        android:textColor="#FFFFFF"
+                        android:layout_marginTop="8dp"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- reglas -->
+            <TextView
+                android:text="25 preguntas • 1mnt por pregunta"
+                android:textSize="14sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="10dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <!-- botón blanco -->
+            <Button
+                android:id="@+id/btnEntrar"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="¡Comenzar Reto!"
+                android:layout_gravity="center_horizontal"
+                android:visibility="gone"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/btn_lobby_white"
+                android:textColor="#FF7A39"
+                android:textStyle="bold"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"/>
+
+            <!-- Mensaje de espera (sin spinner) -->
+            <TextView
+                android:id="@+id/tvMensajeEspera"
+                android:text="Debes esperar que tu oponente te acepte"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"
+                android:layout_marginTop="20dp"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"/>
+            
+            <!-- Botón Abandonar Reto (solo para retador) -->
+            <Button
+                android:id="@+id/btnAbandonar"
+                android:layout_width="wrap_content"
+                android:layout_height="48dp"
+                android:text="¡Abandonar!"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/btn_lobby_white"
+                android:backgroundTint="@null"
+                android:textColor="#FF7A39"
+                android:textStyle="bold"
+                android:paddingStart="24dp"
+                android:paddingEnd="24dp"
+                android:visibility="gone"/>
+        </LinearLayout>
+    </ScrollView>
+
+</FrameLayout>

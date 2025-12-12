@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@drawable/card_bg"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvTitulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textColor="@color/text_primary"
+        android:text="Juan te desafió"/>
+
+    <TextView
+        android:id="@+id/tvSub"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Matemáticas • pendiente"
+        android:textColor="@color/text_muted"
+        android:layout_marginTop="2dp"/>
+
+    <!-- Botones lado a lado -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <!-- RECHAZAR (outline) -->
+        <Button
+            android:id="@+id/btnRechazar"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:text="Rechazar"
+            android:backgroundTint="@color/red"
+            android:textColor="@android:color/white"/>
+
+        <!-- ACEPTAR (tu botón existente) -->
+        <Button
+            android:id="@+id/btnAceptar"
+            android:layout_width="0dp"
+            android:layout_height="42dp"
+            android:layout_weight="1"
+            android:layout_marginStart="10dp"
+            android:text="Aceptar reto"
+            android:backgroundTint="@color/verde_buen"
+            android:textColor="@android:color/white"/>
+    </LinearLayout>
+</LinearLayout>

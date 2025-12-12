@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/nav_islas"
+        android:icon="@drawable/ic_nav_home"
+        android:title="@string/nav_home" />
+    <item
+        android:id="@+id/nav_progreso"
+        android:icon="@drawable/ic_nav_progress"
+        android:title="@string/nav_progress" />
+    <item
+        android:id="@+id/nav_logros"
+        android:icon="@drawable/ic_nav_achievements"
+        android:title="@string/nav_achievements" />
+    <item
+        android:id="@+id/nav_retos"
+        android:icon="@drawable/ic_nav_challenges"
+        android:title="@string/nav_challenges" />
+    <item
+        android:id="@+id/nav_ra"
+        android:icon="@drawable/ic_nav_ra"
+        android:title="RA" />
+</menu>

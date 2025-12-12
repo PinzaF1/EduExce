@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="48dp"
+        android:paddingBottom="32dp">
+
+        <!-- Header con título, progreso y vidas -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="12dp">
+
+            <TextView
+                android:id="@+id/tvAreaSubtema"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pregunta 1 de 5 • Matemáticas"
+                android:textStyle="bold"
+                android:textSize="16sp"
+                android:textColor="#111827"
+                android:gravity="center"/>
+
+            <!-- Contenedor de vidas (visible solo para niveles 2+) -->
+            <LinearLayout
+                android:id="@+id/llVidasContainer"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center"
+                android:layout_marginTop="8dp"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:id="@+id/llVidas"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center"/>
+
+                <TextView
+                    android:id="@+id/tvTiempoRecarga"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:textSize="12sp"
+                    android:textColor="#666666"
+                    android:visibility="gone"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- ProgressBar oculto por defecto - NO mostrar pantalla de carga -->
+        <ProgressBar
+            android:id="@+id/progress"
+            style="?android:attr/progressBarStyleLarge"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:visibility="gone"
+            android:padding="8dp" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvQuestions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="8dp"
+            android:nestedScrollingEnabled="false"/>
+
+        <Button
+            android:id="@+id/btnEnviar"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="Siguiente Pregunta"
+            android:textAllCaps="false"
+            android:textStyle="bold"
+            android:textColor="#FFFFFF"
+            android:textSize="16sp"
+            android:background="@drawable/bg_button_area_color"
+            android:elevation="4dp"/>
+    </LinearLayout>
+</ScrollView>

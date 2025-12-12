@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.VIBRATE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@drawable/iconoeduexce"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/robot"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.ZAVIRA_MOVIL"
+        android:usesCleartextTraffic="true"
+        android:name=".App">
+        <!-- Receiver global para manejar sesión expirada enviada por RetrofitClient -->
+        <receiver android:name=".SessionExpiredReceiver" android:exported="false">
+            <intent-filter>
+                <action android:name="com.example.zavira_movil.ACTION_SESSION_EXPIRED" />
+            </intent-filter>
+        </receiver>
+        <activity
+            android:name=".Home.SplashActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Home.NotificationsActivity"
+            android:exported="false" /> <!-- Lanzador -->
+        <activity
+            android:name=".MainActivity"
+            android:exported="true">
+
+            <!-- Abre la app normalmente (animación → login) -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Deep Link para abrir la app desde el QR -->
+            <intent-filter android:autoVerify="true">
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+
+                <!-- TU dominio publicado en GitHub Pages -->
+                <data
+                    android:host="pinzaf1.github.io"
+                    android:pathPrefix="/EDUEXCE_MOVIL_MOVIL"
+                    android:scheme="https" />
+            </intent-filter>
+        </activity> <!-- Login / flujo principal -->
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <activity
+            android:name=".resetpassword.ResetPasswordActivity"
+            android:exported="false"
+            android:label="Recuperar Contraseña" />
+        <!-- ELIMINAR ESTA LÍNEA DUPLICADA:
+        <activity android:name=".Home.SplashActivity" android:exported="false" />
+        -->
+        <activity
+            android:name=".Home.HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".niveleshome.SubjectDetailActivity"
+            android:exported="false" />
+        <activity
+            android:name=".niveleshome.MapaActivity"
+            android:exported="false" />
+        <activity
+            android:name=".niveleshome.QuizActivity"
+            android:exported="false" />
+        <activity
+            android:name=".niveleshome.SimulacroActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HislaConocimiento.IslasActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Perfil.ProfileActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Perfil.Modelo3DRAActivity"
+            android:exported="false" /> <!-- Islas / Simulacros -->
+        <activity
+            android:name=".HislaConocimiento.IslaSimulacroActivity"
+            android:exported="false"
+            android:label="Simulacro Isla" />
+        <activity
+            android:name=".HislaConocimiento.IslaPreguntasActivity"
+            android:exported="false"
+            android:label="Preguntas Simulacro" />
+        <activity
+            android:name=".HislaConocimiento.IslaResultadoActivity"
+            android:exported="false"
+            android:label="Resultados Simulacro" />
+        <activity
+            android:name=".InfoAcademico"
+            android:exported="false" />
+        <activity
+            android:name=".TestAcademico"
+            android:exported="false" />
+        <activity
+            android:name=".ResultadoAcademicoActivity"
+            android:exported="false" />
+        <activity
+            android:name=".InfoTestActivity"
+            android:exported="false" /> <!-- Ranking -->
+        <activity
+            android:name=".ui.ranking.RankingLogrosActivity"
+            android:exported="false" /> <!-- Resultados / tests sueltos -->
+        <activity
+            android:name=".TestActivity"
+            android:exported="false" />
+        <activity
+            android:name=".ResultActivity"
+            android:exported="false" />
+        <activity
+            android:name=".HislaConocimiento.IslaModalityActivity"
+            android:exported="false" /> <!-- Servicio de Firebase Cloud Messaging -->
+        <service
+            android:name=".notifications.MyFirebaseMessagingService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+
+        </service>
+        
+        <!-- Servicio alternativo de polling para retos (fallback cuando FCM no funciona) -->
+        <service
+            android:name=".services.RetosPollingService"
+            android:exported="false"
+            android:enabled="true" />
+
+        <!-- Metadata para el canal de notificaciones por defecto -->
+
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@drawable/iconoeduexce" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_color"
+            android:resource="@color/colorPrimary" />
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="@string/default_notification_channel_id" />
+
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+    </application>
+
+</manifest>

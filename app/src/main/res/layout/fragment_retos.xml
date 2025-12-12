@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/scrollRoot"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/bg_page">
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:padding="16dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Título -->
+        <TextView
+            android:text="Selecciona la materia"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Contenedor de chips -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="12dp">
+
+            <!-- Fila 1 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/chipMat"
+                    style="@style/Chip"
+                    android:text="Matemáticas"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:id="@+id/chipLen"
+                    style="@style/Chip"
+                    android:text="Lenguaje"/>
+            </LinearLayout>
+
+            <!-- Fila 2 -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginBottom="8dp">
+
+                <TextView
+                    android:id="@+id/chipCie"
+                    style="@style/Chip"
+                    android:text="Ciencias"
+                    android:layout_marginEnd="8dp"/>
+
+                <TextView
+                    android:id="@+id/chipSoc"
+                    style="@style/Chip"
+                    android:text="Sociales"/>
+            </LinearLayout>
+
+            <!-- Fila 3 (Inglés centrado) -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_horizontal">
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+
+                <TextView
+                    android:id="@+id/chipIng"
+                    style="@style/Chip"
+                    android:text="Inglés"
+                    android:layout_width="wrap_content"
+                    android:layout_height="48dp"
+                    android:gravity="center"/>
+
+                <Space
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"/>
+            </LinearLayout>
+        </LinearLayout>
+
+        <!-- Título de oponentes -->
+        <TextView
+            android:text="Elige tu oponente"
+            android:textStyle="bold"
+            android:textColor="@color/text_primary"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+
+        <!-- Lista de oponentes (wrap_content + nestedScrollingEnabled=false) -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/rvOpponents"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:nestedScrollingEnabled="false"
+            android:overScrollMode="never"
+            android:clipToPadding="false"
+            android:paddingBottom="12dp" />
+
+        <!-- Botón Enviar Reto -->
+        <LinearLayout
+            android:id="@+id/btnEnviarReto"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_button_enviar_reto_selector"
+            android:gravity="center"
+            android:orientation="horizontal"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:elevation="4dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:enabled="false">
+
+            <ImageView
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:src="@drawable/ic_swords_white"
+                android:contentDescription=""
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Enviar Reto"
+                android:textColor="@android:color/white"
+                android:textSize="16sp"
+                android:textStyle="bold" />
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center">
+
+    <!-- Fondo con borde, ahora más pequeño -->
+    <View
+        android:id="@+id/rootBadge"
+        android:layout_width="223dp"
+        android:layout_height="246dp"
+        android:background="@drawable/bg_badge_pendiente" />
+
+    <!-- Contenido del popup reducido pero igual diseño -->
+    <LinearLayout
+        android:id="@+id/dialogRoot"
+        android:layout_width="220dp"
+        android:layout_height="wrap_content"
+        android:background="@android:color/white"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="18dp">
+
+        <ImageView
+            android:id="@+id/ivIconoInsignia"
+            android:layout_width="70dp"
+            android:layout_height="70dp"
+            android:layout_marginBottom="10dp"
+            android:scaleType="fitCenter" />
+
+        <TextView
+            android:id="@+id/tvNombreInsignia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="6dp"
+            android:gravity="center"
+            android:text="Isla completa: Matemáticas"
+            android:textColor="#1F2937"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvDescripcionInsignia"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="14dp"
+            android:gravity="center"
+            android:text="Completaste todas las paradas del área de Matemáticas."
+            android:textColor="#666"
+            android:textSize="12sp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnContinuar"
+            android:layout_width="match_parent"
+            android:layout_height="40dp"
+            android:elevation="2dp"
+            android:text="Continuar"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            app:backgroundTint="@color/colorPrimary"
+            app:cornerRadius="12dp" />
+
+    </LinearLayout>
+
+</FrameLayout>

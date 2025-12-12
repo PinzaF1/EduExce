@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.card.MaterialCardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardCornerRadius="24dp"
+    app:cardElevation="0dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeWidth="0dp">
+
+    <ScrollView
+        android:id="@+id/scrollViewKolb"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fillViewport="false"
+        android:scrollbars="vertical"
+        android:fadeScrollbars="false"
+        android:overScrollMode="always">
+
+        <LinearLayout
+            android:id="@+id/llContentKolb"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/bg_blue_outline"
+            android:padding="20dp"
+            android:paddingBottom="24dp">
+
+        <!-- Ícono centrado arriba (mismo color que el botón Cerrar) -->
+        <ImageView
+            android:id="@+id/ivKolbIcon"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="center_horizontal"
+            android:contentDescription="@string/app_name"
+            android:layout_marginBottom="12dp"
+            android:src="@drawable/kolb"
+            app:tint="@color/blue" />
+
+        <!-- Título -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilo de aprendizaje"
+            android:layout_marginTop="10dp"
+            android:textStyle="bold"
+            android:textSize="18sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="12dp"/>
+
+        <!-- Info -->
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Estilo:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvEstiloSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Fecha:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvFechaSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Descripción:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvDescripcionSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Características:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvCaracteristicasSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="10dp"/>
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Recomendaciones:"
+            android:textSize="12sp"
+            android:textColor="@color/text_muted"/>
+
+        <TextView
+            android:id="@+id/tvRecomendacionesSheet"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="-"
+            android:textSize="15sp"
+            android:textColor="@color/text_primary"
+            android:paddingBottom="16dp"/>
+
+        <!-- Botón Cerrar centrado al final -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/btnCerrarSheet"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:text="Cerrar"
+            android:textAllCaps="false"
+            android:textColor="@android:color/white"
+            app:backgroundTint="#2563EB"
+            app:cornerRadius="12dp"/>
+        </LinearLayout>
+    </ScrollView>
+</com.google.android.material.card.MaterialCardView>

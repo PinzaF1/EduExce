@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">EduExce</string>
+    <string name="expandir">Expandir</string>
+    <string name="back">Atrás</string>
+    <string name="ver_detalle">Ver detalle</string>
+    <item name="tag_header_image" type="id" />
+
+    <string name="tab_resumen">Resumen</string>
+    <string name="tab_diagnostico_inicial">Diagnóstico inicial</string>
+    <string name="tab_historial">Historial</string>
+    <string name="oponente_predeterminado">Oponente</string>
+
+    <!-- Notificaciones -->
+    <string name="default_notification_channel_id">eduexce_notifications</string>
+    <string name="default_notification_channel_name">Notificaciones de EduExce</string>
+    <string name="notification_title">Nueva notificación</string>
+    <string name="notification_message">Tienes una nueva notificación</string>
+
+    <!-- Navegación inferior -->
+    <string name="nav_home">Inicio</string>
+    <string name="nav_progress">Progreso</string>
+    <string name="nav_achievements">Logros</string>
+    <string name="nav_challenges">Retos</string>
+    <string name="nav_profile">Perfil</string>
+
+</resources>
